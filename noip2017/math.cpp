@@ -1,9 +1,11 @@
+#define MAX 1000000
+
 #include<cstdio>
 #include<iostream>
 #include<cstring>
 using namespace std;
 
-int a[3], dp[10000000];
+int a[2], dp[MAX];
 
 bool dfs(int remain){
     if(dp[remain] == 1) return true;
@@ -21,14 +23,15 @@ bool dfs(int remain){
     return false;
 }
 
-int min(int a, int b){
+inline int min(int a, int b){
     return a<b ? a : b;
 }
 
 int main(){
     cin >> a[0] >> a[1];
     memset(dp, 0, sizeof(dp));
-    int sep = min(a[0], a[1]), cnt = 0;
+    int sep = min(a[0], a[1]);
+    int cnt = 0;
     for(int i=sep; ;i++){
         //cout << i << "------------" << endl;
         if(dfs(i)){
