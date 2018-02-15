@@ -1,55 +1,58 @@
 #include<cstdio>
 #include<iostream>
-#include<algorithm>
-#include<cstring>
-#include<queue>
-#include<vector>
+#define MAXN 25
+#define INF 2100000000
 using namespace std;
 
-struct Num {
-    int a, b;
-    bool operator < (const Num num) const{
-        return this->a > num.a;
-    }
-};
+int n, a[MAXN], s[MAXN];
+int dp[MAXN][MAXN] = {0};
+int sep[MAXN][MAXN];
+int bef[MAXN] = {0}, aft[MAXN] = {0};
 
-int n, ans[1005], tot = 0, pos = 0, pre[1005], post[1005];
-Num num[105], num1, num2, ntemp;
-priority_queue<Num, vector<Num>, less<Num>> pq;
+void dfs(int l, int r, int type){
+  if(r-l > 0){
+    int k;
+    k = sep[l][r];
+    dfs(l, k, type);
+    dfs(k+1, r, type);
+    if(type == 0){
+      bef[l] ++;
+      aft[r] ++;
+    }else{
+      cout << s[r] - s[l-1] << " ";
+    }
+  }
+  return;
+}
 
 int main(){
-    memset(pre, 0, sizeof(pre));
-    memset(post, 0, sizeof(post));
-    int tmp1, tmp2;
-    cin >> n;
-    for(int i=0; i<n; i++){
-        cin >> num[i].a;
-        num[i].b = i;
-        pq.push(num[i]);
+  cin >> n;
+  s[0] = 0;
+  for(int i=1; i<=n; i++){
+    cin >> a[i];
+    s[i] = s[i-1] + a[i];
+    sep[i][i] = i;
+  }
+  for(int len=1; len<n; len++){
+    for(int l=1, r; (r=l+len)<=n; l++){
+      dp[l][r] = INF;
+      for(int k=l; k<r; k++){
+        if(dp[l][r] >= dp[l][k]+dp[k+1][r]+s[r]-s[l-1]){
+          dp[l][r] = dp[l][k]+dp[k+1][r]+s[r]-s[l-1];
+          sep[l][r] = k;
+        }
+      }
     }
-
-    sort(num, num+n);
-
-    while(pq.size() > 1){
-        num1 = pq.top();
-        pq.pop();
-        num2 = pq.top();
-        pq.pop();
-        ntemp.a = num1.a + num2.a;
-        ntemp.b = min(num1.b, num2.b);
-        ans[pos++] = ntemp.a;
-        tot += ntemp.a;
-        pq.push(ntemp);
-    }
-
-    // for(int i=0; i<n; i++){
-    //     cout << num[i].a << " " << num[i].b << endl;
-    // }
-
-    cout << tot << endl;
-    for(int i=0; i<pos; i++){
-        cout << ans[i] << " ";
-    }
-
-    return 0;
+  }
+  dfs(1, n, 0);
+  for(int i=1; i<=n; i++){
+    for(int j=0; j<bef[i]; j++) cout << "(";
+    cout << a[i];
+    for(int j=0; j<aft[i]; j++) cout << ")";
+    if(i!=n) cout << "+";
+  }
+  cout << endl << dp[1][n] << endl;
+  dfs(1, n, 1);
+  // cout << endl << sep[1][n];
+  return 0;
 }

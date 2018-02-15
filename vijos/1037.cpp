@@ -3,7 +3,7 @@
 #include<algorithm>
 #define NEGINF -100000000
 #define MAXN 105
-#define MAXH 2000
+#define MAXH 2005
 using namespace std;
 
 int dp[MAXN][MAXH];
