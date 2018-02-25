@@ -1,51 +1,51 @@
 #include<cstdio>
 #include<iostream>
-#define MAXN 305
-#define MAXM 305
+#include<cstring>
+#define MAXN 301
+#define MAXM 301
 using namespace std;
 
 int n, m;
+int pa[MAXN] = {0}, l[MAXN] = {0}, r[MAXN] = {0}, c[MAXN] = {0};
 int dp[MAXN][MAXM] = {0};
-bool adjm[MAXN][MAXN] = {false};
-// int indeg[MAXN] = {0};
-int from[MAXN] = {0}, w[MAXN] = {0};
 
-void dfs(int nodeid){
-  for(int i=1; i<=n; i++){
-    if(adjm[nodeid][i]){
-      dfs(i);
-      if(!nodeid) continue;
-      for(int j=1; j<=m; j++){
-        dp[nodeid][j] = max(dp[nodeid][j], dp[i][j-1]+w[nodeid]);
-      }
+void dfs(int i){
+    if(i == 0) return;
+    // cout << i << " ";
+    dfs(r[i]);
+    dfs(l[i]);
+    int tm = m;
+    if(i == n+1) tm++;
+    for(int j=1; j<=tm; j++){
+        dp[i][j] = dp[r[i]][j];
     }
-  }
+    for(int j=1; j<=tm; j++){
+        for(int k=0; k<j; k++){
+            dp[i][j] = max(dp[i][j], dp[l[i]][k] + dp[r[i]][j-k-1] + c[i]);
+        }
+    }
+    // cout << i << " : ";
+    // for(int j=1; j<=tm; j++){
+    //     cout << dp[i][j] << " ";
+    // }
+    // cout << endl;
+    return;
 }
 
 int main(){
-  cin >> n >> m;
-  for(int i=1; i<=n; i++){
-    cin  >> from[i] >> w[i];
-    dp[i][1] = w[i];
-    adjm[from[i]][i] = true;
-  }
-  dfs(0);
-  for(int i=1; i<=n; i++){
-    if(adjm[0][i]){
-      for(int k=1; k<=m; k++){
-        for(int j=m; j>=k; j--){
-          dp[0][j] = max(dp[0][j], dp[0][j-k]+dp[i][k]);
-        }
-      }
+    cin >> n >> m;
+    int tpa, tc, t;
+    for(int i=1; i<=n; i++){
+        cin >> tpa >> c[i];
+        if(tpa == 0) tpa = n+1;
+        t = l[tpa];
+        l[tpa] = i;
+        r[i] = t;
     }
-  }
-  for(int i=0; i<=n; i++){
-    cout << i << " " << w[i]<< "|";
-    for(int j=0; j<=m; j++){
-      cout << dp[i][j] << " ";
-    }
-    cout << endl;
-  }
-  cout << dp[0][m];
-  return 0;
+
+    dfs(n+1);
+
+    cout << dp[n+1][m+1];
+
+    return 0;
 }
