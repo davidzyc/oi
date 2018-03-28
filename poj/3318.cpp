@@ -1,10 +1,11 @@
 #include<cstdio>
 #include<iostream>
 #include<cstring>
+#include<cstdlib>
 using namespace std;
 
-const int GMOD = 10000;
-const int MATN = 11;
+const int GMOD = 0x7f7f7f7f;
+const int MATN = 505;
 
 struct matrix {
   int col, row;
@@ -22,7 +23,7 @@ struct matrix {
     for(int i=0; i<row; i++){
       for(int j=0; j<col; j++){
         tsum.a[i][j] = a[i][j] + m.a[i][j];
-        tsum.a[i][j] %= GMOD;
+        // tsum.a[i][j] %= GMOD;
       }
     }
     return tsum;
@@ -33,7 +34,7 @@ struct matrix {
       for(int j=0; j<m.col; j++){
         for(int k=0; k<col; k++){
           tmul.a[i][j] += a[i][k] * m.a[k][j];
-          tmul.a[i][j] %= GMOD;
+          // tmul.a[i][j] %= GMOD;
         }
       }
     }
@@ -55,21 +56,58 @@ struct matrix {
     }
     return ansm;
   }
+  bool operator == (const matrix &mp) const {
+    for(int i=0; i<row; i++){
+      for(int j=0; j<col; j++){
+        if(a[i][j] != mp.a[i][j]){
+          return false;
+        }
+      }
+    }
+    return true;
+  }
 };
 
+matrix ma(501, 501);
+matrix mb(501, 501);
+matrix mc(501, 501);
+matrix mr(501, 1);
+matrix mtl(501, 1);
+matrix mtr(501, 1);
+
 int main(){
-  int nthfib;
-  while(~scanf("%d", &nthfib)){
-    if(nthfib == -1) return 0;
-    matrix um(2, 2);
-    matrix fib(2, 2);
-    fib.a[0][0] = 0;
-    fib.a[0][1] = 1;
-    um.a[0][0] = 1;
-    um.a[0][1] = 1;
-    um.a[1][0] = 1;
-    fib = fib * (um ^ nthfib);
-    printf("%d\n", fib.a[0][0]);
+  int ncol;
+  int t;
+  scanf("%d", &ncol);
+  for(int i=0; i<ncol; i++){
+    for(int j=0; j<ncol; j++){
+      scanf("%d", &t);
+      ma.a[i][j] = t;
+    }
+  }
+  for(int i=0; i<ncol; i++){
+    for(int j=0; j<ncol; j++){
+      scanf("%d", &t);
+      mb.a[i][j] = t;
+    }
+  }
+  for(int i=0; i<ncol; i++){
+    for(int j=0; j<ncol; j++){
+      scanf("%d", &t);
+      mc.a[i][j] = t;
+    }
+  }
+  srand(87368265);
+  for(int i=0; i<ncol; i++){
+    mr.a[i][0] = rand() % GMOD;
+  }
+  mtl = mb*mr;
+  mtl = ma*mtl;
+  mtr = mc*mr;
+  if(mtl == mtr){
+    printf("YES");
+  }else{
+    printf("NO");
   }
 
   return 0;
