@@ -25,7 +25,7 @@ void dijkstra(){
     pii cur = pq.top();
     pq.pop();
     int tc, tid;
-    tc = cur.first;
+    // tc = cur.first;
     tid = cur.second;
     if(v[tid]) continue;
     v[tid] = 1;
@@ -34,8 +34,8 @@ void dijkstra(){
       if(v[tto]) continue;
       if(d[tid] < INF && d[tid] + c[edge] < d[tto]){
         d[tto] = d[tid] + c[edge];
+        pq.push(make_pair(d[tto], tto));
       }
-      pq.push(make_pair(d[tto], tto));
     }
   }
 }
