@@ -1,25 +1,23 @@
-#include<cstdio>
-#include<iostream>
-#include<cstdlib>
-#include<ctime>
+#include<bits/stdc++.h>
 
 using namespace std;
 
-
-int main(){
-  for(int i=0; i<100; i++){
-    system("randgen.exe");
-    system("4300std.exe");
-    double st = clock();
-    system("4300.exe");
-    double ed = clock();
-    if(system("fc 4300.out 4300.ans")){
-      printf("Wrong Answer!\n\n");
-      return 0;
-    }else{
-      printf("\nAccepted on Test %d time %.0lfms\n\n", i+1, ed-st);
+int main()
+{
+    freopen("1858.in", "w", stdout);
+    srand(time(NULL));
+    int n = 100000, m = 100000;
+    printf("%d %d\n", n, m);
+    for(int i = 1; i <= n; i++) printf("%d ", rand() % 2);
+    printf("\n");
+    for(int i = 1; i <= m; i++) {
+        int caozuo = rand() % 5;
+        printf("%d ", caozuo);
+        int l = rand() % n;
+        printf("%d ", l);
+        int tmp = (n - 1 - l + 1);
+        int r = l + rand() % tmp;
+        printf("%d\n", r);
     }
-  }
-
-  return 0;
+    return 0;
 }

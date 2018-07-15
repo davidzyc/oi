@@ -5,20 +5,21 @@
 
 using namespace std;
 
-const int MAXR = 1000;
+const int MAXR = 2140000000;
 
 int random(int n){
   return rand() % n;
 }
 
 int main(){
-  freopen("4300.in", "w", stdout);
+  freopen("1370.in", "w", stdout);
   srand((unsigned) time(0));
   int n;
-  n = random(MAXR)+2;
+  printf("1\n");
+  n = random(1000)+2;
   printf("%d\n", n);
   for(int i=0; i<n; i++){
-    printf("%d ", random(MAXR)+2100000000);
+    printf("%d ", (random(2) == 1 ? 1 : -1) * random(MAXR));
   }
 
   return 0;
