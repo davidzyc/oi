@@ -4,7 +4,9 @@
 using namespace std;
 
 int main(){
+  double a = 2.9999;
+  int b = a;
+  printf("%d", b);
 
-    cout << "Hello, World!" << endl;
-    return 0;
+  return 0;
 }
