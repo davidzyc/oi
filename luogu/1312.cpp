@@ -1,179 +1,158 @@
 #include<cstdio>
 #include<iostream>
-#include<queue>
-#include<cstring>
+
 using namespace std;
 
-typedef pair<int, int> pii;
-const int MAXM = 1000000;
-// const int DX[2] = {-1, 1};
-const int DX[1] = {1};
-const int DDX[4] = {1, 0, -1, 0}, DDY[4] = {0, 1, 0, -1};
-int maxstep, qsize = 0;
-int mat[MAXM][5][7] = {0}, steps[MAXM] = {0}, last[MAXM] = {0};
-int mvi[MAXM], mvj[MAXM], mvd[MAXM];
-int v[5][7], vc[5][7];
+int n;
+int a[10][10][10] = {0};
+int m[10][10][10] = {0};
+int opx[10], opy[10], opd[10];
+int gbreak = 0;
 
-void print_mat(int mid){
-  cout << endl;
-  cout << "QSIZE: " << mid << endl;
-  cout << "STEPS: " << steps[mid] << endl;
-  cout << "Changed From: " << last[mid] << endl;
-  cout << mvi[mid] << " " << mvj[mid] << " " << mvd[mid] << endl;
-  for(int i=0; i<5; i++){
-    for(int j=0; j<7; j++){
-      cout << mat[mid][i][j] << " ";
+void print_mat(int k){
+  for(int i=1; i<=5; i++){
+    for(int j=1; j<=7; j++){
+      cout<<a[k][i][j] << " ";
     }
     cout << endl;
   }
   cout << endl;
-  cout << endl;
 }
 
-void print_route(int mid){
-  if(mid == 0) return;
-  print_route(last[mid]);
-  // print_mat(mid);
-  cout << mvi[mid] << " " << mvj[mid] << " " << mvd[mid] << endl;
-}
-
-void cp_matrix(int from, int to){
-  for(int i=0; i<5; i++){
-    for(int j=0; j<7; j++){
-      mat[to][i][j] = mat[from][i][j];
+int natural_fall(int k){
+  int flag = 0;
+  int tm[10][10];
+  for(int i=1; i<=5; i++){
+    for(int j=1; j<=5; j++){
+      tm[i][j] = a[k][i][j];
     }
   }
-}
-
-bool check_empty(int mid){
-  int cnt = 0;
-  for(int i=0; i<5; i++){
-    for(int j=0; j<7; j++){
-      cnt += mat[mid][i][j];
+  for(int i=1; i<=5; i++){
+    int j,  jc;
+    for(j = 0, jc = 1;jc <= 7; ++jc){
+      if(a[k][i][jc]) a[k][i][++j] = a[k][i][jc];
+    }
+    for(j++; j<=7; j++){
+      a[k][i][j] = 0;
     }
   }
-  return cnt == 0;
+  for(int i=1; i<=5; i++){
+    for(int j=1; j<=5; j++){
+      if(tm[i][j] != a[k][i][j]) flag = 1;
+    }
+  }
+  return flag;
 }
 
-void natural_fall(int mid){
-  for(int i=0; i<5; i++){
-    int maxh = 0;
-    for(int j=0; j<7; j++){
-      if(mat[mid][i][j]){
-        mat[mid][i][maxh] = mat[mid][i][j];
-        if(maxh != j) mat[mid][i][j] = 0;
-        ++maxh;
+void mark_remove(int k){
+  for(int i=1; i<=5; i++){
+    for(int j=3; j<=7; j++){
+      if(a[k][i][j] == a[k][i][j-1] && a[k][i][j-1] == a[k][i][j-2]){
+        m[k][i][j] = m[k][i][j-1] = m[k][i][j-2] = 1;
       }
     }
   }
-}
-
-void eliminate_block(int mid){
-  bool flag = true;
-  while(flag){
-    flag = false;
-    queue<pii> qc;
-    int tcnt, tcolor;
-    memset(v, 0, sizeof(v));
-    memset(vc, 0, sizeof(vc));
-    for(int i=0; i<5; i++){
-      for(int j=0; j<7; j++){
-        if(v[i][j] || !mat[mid][i][j]) continue;
-        tcnt = 0;
-        tcolor = mat[mid][i][j];
-        v[i][j] = true;
-        qc.push(make_pair(i, j));
-        while(!qc.empty()){
-          pii pcur = qc.front();
-          qc.pop();
-          int ti = pcur.first, tj = pcur.second;
-          int toi, toj;
-          tcnt++;
-          for(int k=0; k<4; k++){
-            toi = ti + DDY[k];
-            toj = tj + DDX[k];
-            if(toi >= 5 || toi < 0 || toj >= 7 || toj < 0 || v[toi][toj] || mat[mid][toi][toj] != tcolor) continue;
-            v[toi][toj] = 1;
-            qc.push(make_pair(toi, toj));
-          }
-        }
-        if(tcnt < 3) continue;
-        // cout << "Eliminated" << endl;
-        vc[i][j] = true;
-        qc.push(make_pair(i, j));
-        while(!qc.empty()){
-          pii pcur = qc.front();
-          qc.pop();
-          int ti = pcur.first, tj = pcur.second;
-          mat[mid][ti][tj] = 0;
-          int toi, toj;
-          for(int k=0; k<4; k++){
-            toi = ti + DDY[k];
-            toj = tj + DDX[k];
-            if(toi >= 5 || toi < 0 || toj >= 7 || toj < 0 || vc[toi][toj] || mat[mid][toi][toj] != tcolor) continue;
-            vc[toi][toj] = 1;
-            qc.push(make_pair(toi, toj));
-          }
-        }
-        natural_fall(mid);
-        flag = true;
+  for(int j=1; j<=7; j++){
+    for(int i=3; i<=5; i++){
+      if(a[k][i][j] == a[k][i-1][j] && a[k][i-1][j] == a[k][i-2][j]){
+        m[k][i][j] = m[k][i-1][j] = m[k][i-2][j] = 1;
       }
     }
-
   }
+  for(int i=1; i<=5; i++){
+    for(int j=1; j<=7; j++){
+      // cout << m[k][i][j] << " ";
+      if(m[k][i][j]){
+        // cout << "HI";
+        m[k][i][j] = 0;
+        a[k][i][j] = 0;
+      }
+    }
+    // cout << endl;
+  }
+  // print_mat(k);
+  return;
+}
+
+void process_fall(int k){
+  // print_mat(k);
+  natural_fall(k);
+  mark_remove(k);
+  while(natural_fall(k)){
+    // print_mat(k);
+    mark_remove(k);
+  }
+  return;
+}
+
+void cp(int k){
+  for(int i=1; i<=5; i++){
+    for(int j=1; j<=7; j++){
+      a[k][i][j] = a[k-1][i][j];
+    }
+  }
+}
+
+void dfs(int k){
+  if(k == n+1){
+    int flag = 1;
+    for(int i=1; i<=5; i++){
+      for(int j=1; j<=7; j++){
+        if(a[n][i][j]) flag = 0;
+      }
+    }
+    if(flag){
+      // cout << "FIND";
+      for(int i=1; i<=n; i++){
+        printf("%d %d %d\n", opx[i] - 1, opy[i] - 1, opd[i]);
+      }
+      gbreak = 1;
+      // return 0;
+    }
+    return;
+  }
+
+  // int t;
+  for(int i=1; i<=4; i++){
+    for(int j=1; j<=7; j++){
+      cp(k);
+      if(a[k][i][j] == a[k][i+1][j]) continue;
+      if(!a[k][i][j]){
+        opx[k] = i+1;
+        opy[k] = j;
+        opd[k] = -1;
+      }else{
+        opx[k] = i;
+        opy[k] = j;
+        opd[k] = 1;
+      }
+      swap(a[k][i][j], a[k][i+1][j]);
+      process_fall(k);
+      dfs(k+1);
+      if(gbreak) break;
+    }
+    if(gbreak) break;
+  }
+  return;
 }
 
 int main(){
-  freopen("1312.txt", "r", stdin);
-  freopen("1312_out.txt", "w", stdout);
   int t;
-  cin >> maxstep;
-  for(int i=0; i<5; i++){
-    for(int j=0; ; j++){
-      cin >> t;
-      if(t == 0) break;
-      mat[0][i][j] = t;
+  scanf("%d", &n);
+  for(int i=1; i<=5; i++){
+    int j = 0;
+    for(scanf("%d", &t); t; scanf("%d", &t)){
+      a[0][i][++j] = t;
     }
   }
-  queue<int> q;
-  steps[0] = 0;
-  ++qsize;
-  q.push(0);
-  while(!q.empty()){
-    int temp;
-    int cur = q.front();
-    q.pop();
-    eliminate_block(cur);
-    if(check_empty(cur)){
-      // cout << "Find" << endl;
-      print_route(cur);
-      return 0;
-    }
-    // print_mat(cur);
-    if(steps[cur] == maxstep) continue;
-    for(int i=0; i<5; i++){
-      for(int j=0; j<7; j++){
-        if(!mat[cur][i][j]) continue;
-        for(int k=0; k<1; k++){
-          if(i+DX[k] >= 0 && i+DX[k] < 5){
-            cp_matrix(cur, qsize);
-            mat[qsize][i][j] = mat[cur][i+DX[k]][j];
-            mat[qsize][i+DX[k]][j] = mat[cur][i][j];
-            mvi[qsize] = i;
-            mvj[qsize] = j;
-            mvd[qsize] = DX[k];
-            steps[qsize] = steps[cur] + 1;
-            last[qsize] = cur;
-            q.push(qsize);
-            ++qsize;
-            // cout << "Changed!" << endl;
-          }
-        }
-      }
-    }
-  }
-  cout << -1;
-  // natural_fall(0);
+  // process_fall(0);
   // print_mat(0);
+  dfs(1);
+  if(gbreak){
+    return 0;
+  }
+
+  printf("-1");
+
   return 0;
 }
