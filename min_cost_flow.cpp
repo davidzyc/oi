@@ -17,6 +17,7 @@ private:
   int n, en, s, t;
   int head[MAXN], nxt[MAXN], from[MAXN], to[MAXN], flow[MAXN], cost[MAXN];
   int dist[MAXN], inq[MAXN], pedge[MAXN], xflow[MAXN];
+  int mat[100][100];
 
   void _add(int f, int t, int w, int c){
     ++en;
@@ -47,7 +48,6 @@ public:
     memset(dist, 0x3f, sizeof(dist));
     memset(inq, 0, sizeof(inq));
     memset(pedge, 0, sizeof(pedge));
-    // memset(xflow, 0, sizeof(xflow));
     q.push(s);
     inq[s] = 1;
     dist[s] = 0;
@@ -72,27 +72,48 @@ public:
 
   int dfs(int x, int xf){
     if(!pedge[x]){
-      // cout << x;
       return xf;
     }
     int ans = dfs(from[pedge[x]], min(xf, flow[pedge[x]]));
     flow[pedge[x]] -= ans;
     flow[pedge[x]^1] += ans;
-    // cout << "->" << x;
     return ans;
   }
 
   pii ek(){
     int tmp, ans = 0, cst = 0;
+    printm(0, 0);
     while(spfa()){
       tmp = dfs(t, INF);
+      printm(tmp, dist[t]);
       ans += tmp;
       cst += tmp * dist[t];
-      // for(int i=1; i<=n; i++) cout << dist[i] << " ";
-      // cout << endl;
-      // cout << cst<< " ";
     }
     return make_pair(ans, cst);
+  }
+
+  void printm(int cost, int di){
+    memset(mat, 0, sizeof(mat));
+    cout << "----------------" << endl;
+
+    for(int e=2; e<=en; e+=2){
+      mat[from[e]][to[e]] = flow[e];
+      printf("%d %d %d:%d\n", from[e], to[e], flow[e], flow[e+1]);
+    }
+    cout << endl << endl;
+    for(int i=0; i<=n; i++) cout << i << ", ";
+    cout << endl;
+    for(int i=1; i<=n; i++){
+      cout << i << ", ";
+      for(int j=1; j<=n; j++){
+        cout << mat[i][j] << ", ";
+      }
+      cout << endl;
+    }
+
+    cout << endl << endl;
+    printf("Cost: %d\nDistance: %d\n", cost, di);
+    cout << "----------------" << endl;
   }
 
 };
@@ -101,7 +122,7 @@ Network nt;
 int n, m, s, t, w, c;
 
 int main(){
-
+  freopen("C:\\Users\\David\\Desktop\\math.txt", "w", stdout);
   scanf("%d%d%d%d", &n, &m, &s, &t);
   nt.init(n, s, t);
   for(int i=0; i<m; i++){
